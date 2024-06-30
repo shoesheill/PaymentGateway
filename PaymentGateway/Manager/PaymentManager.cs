@@ -9,9 +9,9 @@ namespace PaymentGateway
 {
     public class PaymentManager
     {
-        public async Task<T> ProcessPayment<T>(PaymentMethod paymentMethod, PaymentVersion version, decimal amount, string currency)
+        public async Task<T> ProcessPayment<T>(PaymentMethod paymentMethod, PaymentVersion version, string secretKey, PaymentMode paymentMode, decimal amount, string currency)
         {
-            var paymentService = PaymentServiceFactory.GetPaymentService(paymentMethod, version);
+            var paymentService = PaymentServiceFactory.GetPaymentService(paymentMethod, version, secretKey, paymentMode);
             eSewaRequest eSewaRequest = new eSewaRequest
             {
                 Amount = amount
