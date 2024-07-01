@@ -18,6 +18,6 @@ namespace PaymentGateway.eSewa
         public required string SuccessUrl { get; set; }
         public required string FailureUrl { get; set; }
         public required string SignedFieldNames { get; set; }
-        public required string Signature { get; set; }
+        public string Signature { get; set; }
     }
 }

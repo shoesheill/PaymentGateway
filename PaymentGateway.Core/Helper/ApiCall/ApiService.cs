@@ -13,7 +13,7 @@ namespace PaymentGateway.Core
             _httpClient = httpClient;
         }
 
-        public async Task<T> GetAsyncResult<T>(string apiPath, HttpMethod httpMethod, Dictionary<string, string> headerParam, object? requestBody = null)
+        public async Task<T> GetAsyncResult<T>(string apiPath, HttpMethod httpMethod, Dictionary<string, string> headerParam,Dictionary<string,string> keyValuePairs,  object? requestBody = null)
         {
             try
             {
@@ -26,11 +26,17 @@ namespace PaymentGateway.Core
                 }
 
                 // Create the request
+                //var request = new HttpRequestMessage(httpMethod, apiPath)
+                //{
+                //    Content = requestBody == null ? null : new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json")
+                //};
+
                 var request = new HttpRequestMessage(httpMethod, apiPath)
                 {
                     Content = requestBody == null ? null : new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json")
                 };
-
+                request.Content=new FormUrlEncodedContent(keyValuePairs);
+               
                 // Send the request
                 var response = await _httpClient.SendAsync(request);
 
