@@ -6,5 +6,6 @@ namespace PaymentGateway.Core
     public interface IPaymentService
     {
         Task<T> ProcessPayment<T>(object content, PaymentVersion version);
+        Task<T> VerifyPayment<T>(object content, PaymentVersion version);
     }
 }

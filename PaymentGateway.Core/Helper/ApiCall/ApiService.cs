@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace PaymentGateway.Core
             _httpClient = httpClient;
         }
 
-        public async Task<T> GetAsyncResult<T>(string apiPath, HttpMethod httpMethod, Dictionary<string, string> headerParam,Dictionary<string,string> keyValuePairs,  object? requestBody = null)
+        public async Task<T> GetAsyncResult<T>(string apiPath, HttpMethod httpMethod, Dictionary<string, string> headerParam, Dictionary<string, string> keyValuePairs, object? requestBody = null)
         {
             try
             {
@@ -26,31 +27,31 @@ namespace PaymentGateway.Core
                 }
 
                 // Create the request
-                //var request = new HttpRequestMessage(httpMethod, apiPath)
-                //{
-                //    Content = requestBody == null ? null : new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json")
-                //};
-
                 var request = new HttpRequestMessage(httpMethod, apiPath)
                 {
                     Content = requestBody == null ? null : new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json")
                 };
-                request.Content=new FormUrlEncodedContent(keyValuePairs);
-               
+                request.Content = new FormUrlEncodedContent(keyValuePairs);
+
                 // Send the request
                 var response = await _httpClient.SendAsync(request);
-
-                // Ensure the response is successful
-                response.EnsureSuccessStatusCode();
-
-                // Read and deserialize the response content
-                var result = await response.Content.ReadAsStringAsync();
-                if (string.IsNullOrEmpty(result))
+                if (response.IsSuccessStatusCode)
                 {
-                    return default;
+                    if (response.Content.Headers.ContentType.MediaType == "text/html")
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        return (T)Convert.ChangeType(response.RequestMessage.RequestUri.AbsoluteUri, typeof(T));
+                    }
+                    else
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        return JsonConvert.DeserializeObject<T>(responseBody);
+                    }
                 }
-
-                return JsonConvert.DeserializeObject<T>(result);
+                else
+                {
+                    throw new Exception($"Failed to retrieve data. Status code: {response.StatusCode}");
+                }
             }
             catch (HttpRequestException httpEx)
             {

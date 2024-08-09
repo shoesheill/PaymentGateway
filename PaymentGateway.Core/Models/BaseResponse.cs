@@ -17,7 +17,7 @@ namespace PaymentGateway.Core
         /// Holds the result object to be transmitted
         /// </summary>
         public object data { get; set; }
-        public bool success { get; set; }
+        public bool success { get; set; }= true;
         public int error_code { get; set; }
     }
 }
